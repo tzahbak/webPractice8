@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Browser - React</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+  <style>
+    body {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .img-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: auto;
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 800px;
+      max-height: 700px;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .smallImg-container {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      padding: 8px;
+      margin-bottom: 20px;
+      background-color: rgb(104, 206, 160);
+      width: 100%;
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 2px solid rgb(0, 0, 0);
+    }
+
+    .smallImg {
+      margin: 0 10px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+    }
+
+
+    .start-img-container {
+      position: flex;
+      height: 400px;
+      width: 100%;
+      margin-top: 20px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #c7e7be;
+
+    }
+
+    .start-img-container img {
+      max-width: 400px;
+      max-height: 100vh;
+    }
+
+    .start-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+
+  <script type="text/babel">
+    class ImageViewerApp extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = {
+          selectedImage: null,
+          images: []
+        };
+      }
+
+      componentDidMount() {
+        const Imglimit = 10;
+        fetch('https://picsum.photos/v2/list?limit=' + Imglimit)
+          .then(response => response.json())
+          .then(data => {
+            const images = data.map(item => ({
+              small: `https://picsum.photos/100/100?image=${item.id}`,
+              full: `https://picsum.photos/${item.width}/${item.height}?image=${item.id}`
+            }));
+            this.setState({ images });
+            if (images.length > 0) {
+              this.setState({ selectedImage: images[0].full });
+            }
+          })
+          .catch(error => console.error('Error fetching:', error));
+      }
+
+      select_image = (image_url) => {
+        this.setState({ selectedImage: image_url });
+      }
+
+      render() {
+        return (
+          <div>
+            <div class="smallImg-container">
+              {this.state.images.map(image => (
+                <img src={image.small} key={image.small} class="smallImg" onClick={() => this.select_image(image.full)} />
+              ))}
+            </div>
+            {this.state.selectedImage && (
+              <div class="start-img-container">
+                <img src={this.state.selectedImage} />
+              </div>
+            )}
+          </div>
+        );
+      }
+    }
+    ReactDOM.render(<ImageViewerApp />, document.getElementById('app'));
+  </script>
+</body>
+
+</html>
